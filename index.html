@@ -6,10 +6,10 @@
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <meta name="description"
-    content="A room full of phones becomes one synchronised display. Open a URL, hold up your screen, become a pixel. No installs, no setup. Live at meetups and venues across the UK.">
+    content="A room full of phones becomes one synchronised display. Open a URL, hold up your screen, become a pixel. No installs, no setup. Live at meetups and venues across the UK, and open source under MIT.">
 
   <meta name="keywords"
-    content="pixelmesh, distributed systems, projection mapping, synchronised devices, spatial calibration, real-time rendering, distributed shader, installation art, infrastructure engineering, Manchester encoding, optical signalling, audience interaction">
+    content="pixelmesh, distributed systems, projection mapping, synchronised devices, spatial calibration, real-time rendering, distributed shader, installation art, infrastructure engineering, Manchester encoding, optical signalling, audience interaction, open source">
 
   <meta name="author" content="Adam Davis">
 
@@ -21,7 +21,7 @@
   <meta property="og:url" content="https://pixelmesh.live/">
   <meta property="og:title" content="pixelmesh: a crowd as a display">
   <meta property="og:description"
-    content="A room full of phones becomes one synchronised display. Open a URL, hold up your screen, become a pixel. No installs, no setup.">
+    content="A room full of phones becomes one synchronised display. Open a URL, hold up your screen, become a pixel. No installs, no setup. Open source under MIT.">
   <meta property="og:image" content="https://pixelmesh.live/public/og-image.jpg">
   <meta name="twitter:card" content="summary_large_image">
   <meta name="twitter:title" content="pixelmesh: a crowd as a display">
@@ -118,6 +118,100 @@
       max-width: 1100px;
       margin: 0 auto;
       padding: 0 2.25rem;
+    }
+
+    /* STICKY BAR
+       Hidden over the hero so the wordmark down there is not competing
+       with a second one, then slides in once the hero is scrolled past.
+       The repo link is the only thing here: the page is one scroll and
+       does not need navigation. */
+
+    .topbar {
+      position: fixed;
+      top: 0;
+      left: 0;
+      right: 0;
+      z-index: 50;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 1rem;
+      padding: 0.7rem 2.25rem;
+      background: rgba(2, 2, 4, 0.72);
+      backdrop-filter: blur(14px);
+      -webkit-backdrop-filter: blur(14px);
+      border-bottom: 1px solid rgba(255, 255, 255, 0.07);
+      transform: translateY(-100%);
+      opacity: 0;
+      transition: transform 0.35s ease, opacity 0.35s ease;
+      pointer-events: none;
+    }
+
+    .topbar.is-visible {
+      transform: translateY(0);
+      opacity: 1;
+      pointer-events: auto;
+    }
+
+    .topbar-mark img {
+      display: block;
+      height: 17px;
+      width: auto;
+    }
+
+    .topbar-repo {
+      display: inline-flex;
+      align-items: center;
+      gap: 0.5rem;
+      /* System mono: the link is a path, and it should read as one
+         without pulling a fourth font file over the wire. */
+      font-family: ui-monospace, SFMono-Regular, Menlo, Consolas, monospace;
+      font-size: 0.78rem;
+      letter-spacing: 0.01em;
+      color: var(--muted);
+      text-decoration: none;
+      padding: 0.35rem 0.7rem;
+      border: 1px solid rgba(255, 255, 255, 0.12);
+      border-radius: 7px;
+      white-space: nowrap;
+      transition: color 0.2s ease, border-color 0.2s ease, background 0.2s ease;
+    }
+
+    .topbar-repo:hover {
+      color: var(--text);
+      border-color: rgba(255, 255, 255, 0.28);
+      background: rgba(255, 255, 255, 0.04);
+    }
+
+    .topbar-repo svg {
+      width: 15px;
+      height: 15px;
+      flex-shrink: 0;
+    }
+
+    /* Under ~620px the full path pushes the bar wider than the viewport,
+       so the org segment goes and the repo name carries it. */
+    .topbar-repo .repo-org {
+      display: none;
+    }
+
+    @media (min-width: 620px) {
+      .topbar-repo .repo-org {
+        display: inline;
+      }
+    }
+
+    @media (max-width: 700px) {
+      .topbar {
+        padding: 0.6rem 1.25rem;
+      }
+    }
+
+    @media (prefers-reduced-motion: reduce) {
+      .topbar {
+        transition: opacity 0.35s ease;
+        transform: none;
+      }
     }
 
     /* HERO */
@@ -388,6 +482,62 @@
       margin: 0;
       font-size: 0.92rem;
       color: var(--muted);
+    }
+
+    /* OPEN SOURCE */
+
+    .repo-card {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      flex-wrap: wrap;
+      gap: 1.25rem;
+      margin-top: 2rem;
+      padding: 1.4rem 1.6rem;
+      background: var(--panel);
+      border: 1px solid rgba(255, 255, 255, 0.08);
+      border-radius: 10px;
+    }
+
+    .repo-meta {
+      font-family: ui-monospace, SFMono-Regular, Menlo, Consolas, monospace;
+      font-size: 0.85rem;
+      color: var(--text);
+      margin: 0;
+      word-break: break-word;
+    }
+
+    .repo-sub {
+      display: block;
+      font-family: 'Inter', sans-serif;
+      font-size: 0.8rem;
+      color: var(--muted);
+      margin-top: 0.4rem;
+      letter-spacing: 0.02em;
+    }
+
+    .repo-link {
+      display: inline-flex;
+      align-items: center;
+      gap: 0.55rem;
+      font-size: 0.88rem;
+      font-weight: 500;
+      color: var(--bg);
+      background: var(--text);
+      text-decoration: none;
+      padding: 0.6rem 1.1rem;
+      border-radius: 8px;
+      white-space: nowrap;
+      transition: opacity 0.2s ease;
+    }
+
+    .repo-link:hover {
+      opacity: 0.82;
+    }
+
+    .repo-link svg {
+      width: 17px;
+      height: 17px;
     }
 
     .inspiration-strip .tech-item span {
@@ -936,6 +1086,17 @@
 
 <body>
 
+  <div class="topbar" id="topbar">
+    <a class="topbar-mark" href="/" aria-label="pixelmesh home">
+      <img src="/public/pixelmesh_text.svg" alt="pixelmesh">
+    </a>
+    <a class="topbar-repo" href="https://github.com/webmull/pixelmesh"
+       target="_blank" rel="noopener">
+      <svg viewBox="0 0 16 16" fill="currentColor" aria-hidden="true"><path d="M8 0C3.58 0 0 3.58 0 8c0 3.54 2.29 6.53 5.47 7.59.4.07.55-.17.55-.38 0-.19-.01-.82-.01-1.49-2.01.37-2.53-.49-2.69-.94-.09-.23-.48-.94-.82-1.13-.28-.15-.68-.52-.01-.53.63-.01 1.08.58 1.23.82.72 1.21 1.87.87 2.33.66.07-.52.28-.87.51-1.07-1.78-.2-3.64-.89-3.64-3.95 0-.87.31-1.59.82-2.15-.08-.2-.36-1.02.08-2.12 0 0 .67-.21 2.2.82.64-.18 1.32-.27 2-.27.68 0 1.36.09 2 .27 1.53-1.04 2.2-.82 2.2-.82.44 1.1.16 1.92.08 2.12.51.56.82 1.27.82 2.15 0 3.07-1.87 3.75-3.65 3.95.29.25.54.73.54 1.48 0 1.07-.01 1.93-.01 2.2 0 .21.15.46.55.38A8.01 8.01 0 0 0 16 8c0-4.42-3.58-8-8-8z"/></svg>
+      <span><span class="repo-org">webmull/</span>pixelmesh</span>
+    </a>
+  </div>
+
   <section class="hero visible">
     <video class="hero-video" autoplay muted loop playsinline
            preload="auto" poster="/public/video/hero-poster.jpg"
@@ -1221,6 +1382,47 @@
     </div>
   </section>
 
+  <section class="panel">
+    <div class="wrapper full-text">
+      <div class="section-head">
+        <small>Open source</small>
+        <h2>The code is public</h2>
+      </div>
+
+      <p>
+        pixelmesh only exists because the work above was written up in public. Junkyard
+        Jumbotron and PixelPhones were both described well enough that someone could pick
+        the idea up more than a decade later and take it somewhere new. That is the whole
+        reason this repository is open.
+      </p>
+
+      <p>
+        The part worth reading is not the light show. It is that a room of phones can be
+        located by one camera with no app, no QR code, no seat map and no calibration step:
+        every screen blinks its own ID in Manchester code, and the detector reads the whole
+        room at once. That is written down in full, including the constants that only got
+        right by failing in front of real audiences, and the failures that set them.
+      </p>
+
+      <p>
+        It is not a product. No support, no stability promise, and it assumes a laptop, a
+        wired camera and a room. Take the parts that are useful.
+      </p>
+
+      <div class="repo-card">
+        <p class="repo-meta">
+          github.com/webmull/pixelmesh
+          <span class="repo-sub">MIT licensed. Python, FastAPI, OpenCV and a lot of comments about why.</span>
+        </p>
+        <a class="repo-link" href="https://github.com/webmull/pixelmesh"
+           target="_blank" rel="noopener">
+          <svg viewBox="0 0 16 16" fill="currentColor" aria-hidden="true"><path d="M8 0C3.58 0 0 3.58 0 8c0 3.54 2.29 6.53 5.47 7.59.4.07.55-.17.55-.38 0-.19-.01-.82-.01-1.49-2.01.37-2.53-.49-2.69-.94-.09-.23-.48-.94-.82-1.13-.28-.15-.68-.52-.01-.53.63-.01 1.08.58 1.23.82.72 1.21 1.87.87 2.33.66.07-.52.28-.87.51-1.07-1.78-.2-3.64-.89-3.64-3.95 0-.87.31-1.59.82-2.15-.08-.2-.36-1.02.08-2.12 0 0 .67-.21 2.2.82.64-.18 1.32-.27 2-.27.68 0 1.36.09 2 .27 1.53-1.04 2.2-.82 2.2-.82.44 1.1.16 1.92.08 2.12.51.56.82 1.27.82 2.15 0 3.07-1.87 3.75-3.65 3.95.29.25.54.73.54 1.48 0 1.07-.01 1.93-.01 2.2 0 .21.15.46.55.38A8.01 8.01 0 0 0 16 8c0-4.42-3.58-8-8-8z"/></svg>
+          View the source
+        </a>
+      </div>
+    </div>
+  </section>
+
   <section class="panel-strong">
     <div class="wrapper">
       <div class="about-grid">
@@ -1275,6 +1477,29 @@
 
 
   <script>
+    // Sticky bar: shown once the hero is scrolled past. A scroll listener
+    // rather than an IntersectionObserver, because the observer's first
+    // callback races the hero video's layout and can latch the wrong
+    // state on load. Passive + rAF so nothing measures per scroll event.
+    (function () {
+      const bar = document.getElementById("topbar");
+      const hero = document.querySelector(".hero");
+      if (!bar || !hero) return;
+      let queued = false;
+      function apply() {
+        queued = false;
+        bar.classList.toggle("is-visible", window.scrollY > hero.offsetHeight - 60);
+      }
+      function onScroll() {
+        if (queued) return;
+        queued = true;
+        requestAnimationFrame(apply);
+      }
+      window.addEventListener("scroll", onScroll, { passive: true });
+      window.addEventListener("resize", onScroll, { passive: true });
+      apply();
+    })();
+
     const visualBlocks = document.querySelectorAll('.propagation-grid');
     let propVisible = false;
     const visualObserver = new IntersectionObserver(entries => {
