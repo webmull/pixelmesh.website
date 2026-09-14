@@ -136,7 +136,7 @@
       align-items: center;
       justify-content: space-between;
       gap: 1rem;
-      padding: 0.7rem 2.25rem;
+      padding: 0.85rem 2.25rem;
       background: rgba(2, 2, 4, 0.72);
       backdrop-filter: blur(14px);
       -webkit-backdrop-filter: blur(14px);
@@ -155,8 +155,17 @@
 
     .topbar-mark img {
       display: block;
-      height: 17px;
+      /* 17px read as a smudge at a glance. The wordmark is the only thing
+         identifying the bar, so it carries the height and the button stays
+         secondary. */
+      height: 26px;
       width: auto;
+    }
+
+    @media (max-width: 700px) {
+      .topbar-mark img {
+        height: 21px;
+      }
     }
 
     .topbar-repo {
