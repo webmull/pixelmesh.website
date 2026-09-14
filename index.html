@@ -535,6 +535,18 @@
       opacity: 0.82;
     }
 
+    .inline-link {
+      color: var(--text);
+      text-decoration: none;
+      border-bottom: 1px solid rgba(255, 255, 255, 0.3);
+      padding-bottom: 1px;
+      transition: border-color 0.2s ease;
+    }
+
+    .inline-link:hover {
+      border-bottom-color: var(--text);
+    }
+
     .repo-link svg {
       width: 17px;
       height: 17px;
@@ -1128,7 +1140,7 @@
       </h1>
 
       <p class="hero-tag">
-        CALIBRATED DEVICES. SHARED TIME. ONE CANVAS.
+        CALIBRATED IN REAL TIME. SHARED CLOCK. ONE CANVAS. OPEN SOURCE.
       </p>
 
     </div>
@@ -1157,6 +1169,13 @@
           The point isn't graphics on a crowd. It's coordination made visible.
           Distributed systems run beneath everything we use, almost always invisibly.
           pixelmesh pulls one into the open and lets a room watch it behave.
+        </p>
+        <p>
+          And all of it is open. The detector, the phone client, the effects and the operator
+          tooling are on GitHub under MIT, down to the tuning constants that only got right by
+          failing in front of a live audience. <a class="inline-link"
+          href="https://github.com/webmull/pixelmesh" target="_blank" rel="noopener">Read the
+          code</a>.
         </p>
       </div>
       <div class="visual">
