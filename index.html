@@ -1240,6 +1240,58 @@
       margin-top: 2.5rem;
     }
 
+    /* PAST SHOWS, FOLDED
+       Six past shows pushed the section past the point where anyone was
+       still reading. Three, then the rest on request. The class is applied
+       by script, so with no JS the list is simply all there rather than
+       permanently truncated with no way to open it. */
+    .events-list.past.is-folded .event:nth-child(n+4) {
+      display: none;
+    }
+
+    .past-toggle {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      width: 44px;
+      height: 44px;
+      margin: 1.1rem auto 0 auto;
+      padding: 0;
+      border: 1px solid rgba(255, 255, 255, 0.14);
+      border-radius: 50%;
+      background: transparent;
+      color: var(--muted);
+      cursor: pointer;
+      transition: color 0.2s ease, border-color 0.2s ease;
+    }
+
+    .past-toggle:hover {
+      color: var(--text);
+      border-color: rgba(255, 255, 255, 0.3);
+    }
+
+    .past-toggle:focus-visible {
+      outline: 2px solid var(--signal);
+      outline-offset: 3px;
+    }
+
+    .past-toggle svg {
+      width: 18px;
+      height: 18px;
+      transition: transform 0.25s ease;
+    }
+
+    .past-toggle[aria-expanded="true"] svg {
+      transform: rotate(180deg);
+    }
+
+    @media (prefers-reduced-motion: reduce) {
+      .past-toggle svg,
+      .past-toggle {
+        transition: none;
+      }
+    }
+
     .events-cta p {
       margin-bottom: 0.6rem;
       color: var(--muted);
@@ -1884,6 +1936,48 @@
 
 
   <script>
+    // Past shows: fold to three, with the rest behind one arrow.
+    (function () {
+      const list = document.querySelector(".events-list.past");
+      if (!list) return;
+      const hidden = list.querySelectorAll(".event:nth-child(n+4)").length;
+      if (!hidden) return;
+
+      list.classList.add("is-folded");
+      if (!list.id) list.id = "past-shows";
+
+      const btn = document.createElement("button");
+      btn.type = "button";
+      btn.className = "past-toggle";
+      btn.setAttribute("aria-expanded", "false");
+      btn.setAttribute("aria-controls", list.id);
+      btn.innerHTML = '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor"'
+        + ' stroke-width="2" stroke-linecap="round" stroke-linejoin="round"'
+        + ' aria-hidden="true"><path d="M6 9l6 6 6-6"/></svg>';
+
+      function label() {
+        const open = btn.getAttribute("aria-expanded") === "true";
+        // The count is the useful part, and it only exists in the label
+        // because the control itself is deliberately just an arrow.
+        btn.setAttribute("aria-label", open
+          ? "Show fewer past shows"
+          : "Show " + hidden + " more past show" + (hidden === 1 ? "" : "s"));
+      }
+
+      btn.addEventListener("click", function () {
+        const open = btn.getAttribute("aria-expanded") !== "true";
+        btn.setAttribute("aria-expanded", String(open));
+        list.classList.toggle("is-folded", !open);
+        label();
+        // Collapsing from below the fold would otherwise leave the reader
+        // staring at whatever is now under their scroll position.
+        if (!open) btn.scrollIntoView({ block: "center" });
+      });
+
+      label();
+      list.insertAdjacentElement("afterend", btn);
+    })();
+
     // Menu: a jump list, because seven sections over 7500px of phone scroll
     // is the one thing a fixed bar can genuinely help with.
     (function () {
