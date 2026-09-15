@@ -38,6 +38,26 @@
 
   <style>
     /* Self-hosted fonts: no render-blocking third-party requests */
+    /* Two families that actually contrast. Inter and Poppins are both
+       geometric sans and read as one flat voice; a mono gives the technical
+       register somewhere to live. Already shipped in the pixelmesh repo, so
+       it stays self-hosted. */
+    @font-face {
+      font-family: 'JetBrains Mono';
+      src: url('/public/fonts/JetBrainsMono-Regular.woff2') format('woff2');
+      font-weight: 400;
+      font-style: normal;
+      font-display: swap;
+    }
+
+    @font-face {
+      font-family: 'JetBrains Mono';
+      src: url('/public/fonts/JetBrainsMono-Medium.woff2') format('woff2');
+      font-weight: 500;
+      font-style: normal;
+      font-display: swap;
+    }
+
     @font-face {
       font-family: 'Inter';
       src: url('/public/fonts/InterVariable.woff2') format('woff2');
@@ -89,6 +109,11 @@
           rgba(255, 255, 255, 0.18),
           transparent);
       --grid: rgba(255, 255, 255, 0.05);
+      /* What a phone screen goes when the detector has found it. Used only
+         where the system has actually decided something, never as
+         decoration. */
+      --signal: #35e07f;
+      --mono: 'JetBrains Mono', ui-monospace, SFMono-Regular, Menlo, monospace;
     }
 
     * {
@@ -149,20 +174,134 @@
       gap: 1rem;
       padding: 0.85rem 2.25rem;
       padding-top: calc(0.85rem + env(safe-area-inset-top));
-      background: rgba(2, 2, 4, 0.72);
-      backdrop-filter: blur(14px);
-      -webkit-backdrop-filter: blur(14px);
-      border-bottom: 1px solid rgba(255, 255, 255, 0.07);
-      transform: translateY(-100%);
-      opacity: 0;
-      transition: transform 0.35s ease, opacity 0.35s ease;
-      pointer-events: none;
+      /* Persistent, so the menu is always one tap away. Over the hero it
+         carries no plate and no wordmark, because the hero already has a
+         200px one; past the hero it takes on the blur and the mark fades in. */
+      background: transparent;
+      border-bottom: 1px solid transparent;
+      transition: background 0.3s ease, border-color 0.3s ease,
+                  backdrop-filter 0.3s ease;
     }
 
     .topbar.is-visible {
-      transform: translateY(0);
+      background: rgba(2, 2, 4, 0.72);
+      backdrop-filter: blur(14px);
+      -webkit-backdrop-filter: blur(14px);
+      border-bottom-color: rgba(255, 255, 255, 0.07);
+    }
+
+    .topbar-mark {
+      opacity: 0;
+      transition: opacity 0.3s ease;
+      pointer-events: none;
+    }
+
+    .topbar.is-visible .topbar-mark {
       opacity: 1;
       pointer-events: auto;
+    }
+
+    .topbar-actions {
+      display: flex;
+      align-items: center;
+      gap: 0.6rem;
+    }
+
+    /* MENU
+       Seven sections and 7500px of scroll on a phone with no way to move
+       between them. The button is the only chrome that earns being fixed. */
+    .menu-btn {
+      display: inline-flex;
+      flex-direction: column;
+      justify-content: center;
+      gap: 4px;
+      /* 44px is the iOS minimum tap target; 42 was just under it. */
+      width: 44px;
+      height: 44px;
+      padding: 0 10px;
+      border: 1px solid rgba(255, 255, 255, 0.14);
+      border-radius: 8px;
+      background: rgba(2, 2, 4, 0.35);
+      cursor: pointer;
+    }
+
+    .menu-btn span {
+      display: block;
+      height: 1.5px;
+      background: var(--text);
+      border-radius: 2px;
+      transition: transform 0.25s ease, opacity 0.2s ease;
+    }
+
+    .menu-btn[aria-expanded="true"] span:nth-child(1) {
+      transform: translateY(5.5px) rotate(45deg);
+    }
+
+    .menu-btn[aria-expanded="true"] span:nth-child(2) {
+      opacity: 0;
+    }
+
+    .menu-btn[aria-expanded="true"] span:nth-child(3) {
+      transform: translateY(-5.5px) rotate(-45deg);
+    }
+
+    .menu-btn:focus-visible,
+    .topbar-repo:focus-visible,
+    .menu-panel a:focus-visible {
+      outline: 2px solid var(--signal);
+      outline-offset: 3px;
+    }
+
+    .menu-panel {
+      position: fixed;
+      inset: 0;
+      z-index: 49;
+      background: rgba(2, 2, 4, 0.94);
+      backdrop-filter: blur(18px);
+      -webkit-backdrop-filter: blur(18px);
+      display: flex;
+      flex-direction: column;
+      justify-content: center;
+      padding: 5rem 2.25rem calc(2.25rem + env(safe-area-inset-bottom)) 2.25rem;
+      opacity: 0;
+      pointer-events: none;
+      transition: opacity 0.25s ease;
+    }
+
+    .menu-panel.is-open {
+      opacity: 1;
+      pointer-events: auto;
+    }
+
+    .menu-panel ol {
+      list-style: none;
+      margin: 0;
+      padding: 0;
+      display: grid;
+      gap: 0.35rem;
+      max-width: 34rem;
+      width: 100%;
+      margin-inline: auto;
+    }
+
+    .menu-panel a {
+      display: flex;
+      align-items: baseline;
+      gap: 1rem;
+      padding: 0.7rem 0;
+      font-size: clamp(1.45rem, 6vw, 2rem);
+      font-weight: 600;
+      letter-spacing: -0.02em;
+      color: var(--text);
+      text-decoration: none;
+      border-bottom: 1px solid rgba(255, 255, 255, 0.08);
+    }
+
+    @media (prefers-reduced-motion: reduce) {
+      .menu-btn span,
+      .menu-panel {
+        transition: none;
+      }
     }
 
     .topbar-mark img {
@@ -495,6 +634,47 @@
           transparent 64px);
     }
 
+    /* HERO MESH
+       The page opens by doing what the product does: every cell blinks its
+       own code, the cells lock one at a time as they are found, one sweep
+       crosses the located room, then it settles and the animation stops.
+       Runs once on load, not on a loop - a room only gets found once.
+       Cells are on the same 64px module as .bg-grid, so each lit square
+       sits inside a ruled cell rather than floating over it. */
+    .hero-mesh {
+      position: absolute;
+      inset: 0;
+      z-index: 2;
+      display: grid;
+      grid-auto-rows: 32px;
+      grid-template-columns: repeat(auto-fill, 32px);
+      pointer-events: none;
+      /* Faded away from the middle so the wordmark and tagline sit on clean
+         footage. The sampling grid belongs at the edges of the frame, which
+         is also where a real detector has the least to look at. */
+      mask-image: radial-gradient(ellipse 58% 62% at 50% 62%,
+          transparent 35%, #000 100%);
+      -webkit-mask-image: radial-gradient(ellipse 58% 62% at 50% 62%,
+          transparent 35%, #000 100%);
+    }
+
+    .hero-mesh i {
+      display: block;
+      /* 4px points on a 32px module: the detector samples the frame, it does
+         not tile it. At 64px with 38px cells this read as a mosaic filter
+         over the footage and buried the thing the footage is proving. */
+      width: 4px;
+      height: 4px;
+      margin: 14px;
+      background: #ffffff;
+      /* The settled state, in CSS. requestAnimationFrame is paused for a
+         backgrounded tab, so starting at 0 meant a page opened in the
+         background had no mesh at all. The sequence plays on top of this
+         rather than creating it. */
+      opacity: 0.07;
+      will-change: opacity;
+    }
+
     .tech-strip {
       margin-top: 3rem;
       display: flex;
@@ -583,7 +763,7 @@
     }
 
     .file-list a {
-      font-family: ui-monospace, SFMono-Regular, Menlo, Consolas, monospace;
+      font-family: var(--mono);
       font-size: 0.95rem;
       color: var(--text);
       text-decoration: none;
@@ -919,18 +1099,23 @@
       box-shadow: 0 0 10px rgba(255, 255, 255, 0.55);
     }
 
-    .events-list.past .event::before {
-      opacity: 0.22;
-      box-shadow: none;
+    /* and the pixel on the rail beside it, so the accent reads as one
+       statement rather than two unrelated green things */
+    .event:has(.event-next-badge)::before {
+      background: var(--signal);
+      box-shadow: 0 0 12px rgba(53, 224, 127, 0.65);
     }
 
     .event-next-badge {
+      font-family: var(--mono);
       display: inline-block;
       font-size: 0.55rem;
       letter-spacing: 0.25em;
       text-transform: uppercase;
-      color: var(--bg);
-      background: var(--text);
+      /* The only place the page states something currently true, so the
+         only place the signal colour is spent. */
+      color: #04140b;
+      background: var(--signal);
       padding: 0.16rem 0.5rem 0.12rem 0.6rem;
       margin-left: 0.55rem;
       vertical-align: 0.16em;
@@ -986,16 +1171,17 @@
 
     .event-when b {
       display: block;
-      font-family: 'Poppins', sans-serif;
-      font-size: 1.25rem;
+      font-family: var(--mono);
+      font-size: 1.2rem;
       font-weight: 600;
       line-height: 1.15;
       color: var(--text);
     }
 
     .event-when span {
-      font-size: 0.6rem;
-      letter-spacing: 0.18em;
+      font-family: var(--mono);
+      font-size: 0.62rem;
+      letter-spacing: 0.14em;
       text-transform: uppercase;
       color: var(--muted);
     }
@@ -1217,12 +1403,31 @@
     <a class="topbar-mark" href="/" aria-label="pixelmesh home">
       <img src="/public/pixelmesh_text.svg" alt="pixelmesh">
     </a>
+    <div class="topbar-actions">
     <a class="topbar-repo" href="https://github.com/webmull/pixelmesh"
        target="_blank" rel="noopener">
       <svg viewBox="0 0 16 16" fill="currentColor" aria-hidden="true"><path d="M8 0C3.58 0 0 3.58 0 8c0 3.54 2.29 6.53 5.47 7.59.4.07.55-.17.55-.38 0-.19-.01-.82-.01-1.49-2.01.37-2.53-.49-2.69-.94-.09-.23-.48-.94-.82-1.13-.28-.15-.68-.52-.01-.53.63-.01 1.08.58 1.23.82.72 1.21 1.87.87 2.33.66.07-.52.28-.87.51-1.07-1.78-.2-3.64-.89-3.64-3.95 0-.87.31-1.59.82-2.15-.08-.2-.36-1.02.08-2.12 0 0 .67-.21 2.2.82.64-.18 1.32-.27 2-.27.68 0 1.36.09 2 .27 1.53-1.04 2.2-.82 2.2-.82.44 1.1.16 1.92.08 2.12.51.56.82 1.27.82 2.15 0 3.07-1.87 3.75-3.65 3.95.29.25.54.73.54 1.48 0 1.07-.01 1.93-.01 2.2 0 .21.15.46.55.38A8.01 8.01 0 0 0 16 8c0-4.42-3.58-8-8-8z"/></svg>
       <span>View source</span>
     </a>
+
+    <button class="menu-btn" id="menu-btn" type="button"
+            aria-expanded="false" aria-controls="menu-panel" aria-label="Open menu">
+      <span></span><span></span><span></span>
+    </button>
+    </div>
   </div>
+
+  <nav class="menu-panel" id="menu-panel" aria-label="Sections" hidden>
+    <ol>
+      <li><a href="#overview">A crowd as a display</a></li>
+      <li><a href="#how">How devices find their place</a></li>
+      <li><a href="#practice">Built for crowds</a></li>
+      <li><a href="#shows">Where it has run</a></li>
+      <li><a href="#origins">Inspiration</a></li>
+      <li><a href="#code">The code is public</a></li>
+      <li><a href="#about">Built by Adam Davis</a></li>
+    </ol>
+  </nav>
 
   <section class="hero visible">
     <video class="hero-video" autoplay muted loop playsinline
@@ -1291,6 +1496,7 @@
     </script>
     <div class="hero-shade"></div>
     <div class="bg-grid"></div>
+    <div class="hero-mesh" id="hero-mesh" aria-hidden="true"></div>
     <div class="wrapper hero-inner">
 
       <h1 class="hero-wordmark">
@@ -1308,7 +1514,7 @@
     </div>
   </section>
 
-  <section>
+  <section id="overview">
     <div class="wrapper split">
       <div>
         <div class="section-head">
@@ -1357,7 +1563,7 @@
     </div>
   </section>
 
-  <section class="panel">
+  <section id="how" class="panel">
     <div class="wrapper">
       <div class="section-head">
         <h2>How devices find their place</h2>
@@ -1403,7 +1609,7 @@
     </div>
   </section>
 
-  <section class="panel-strong">
+  <section id="practice" class="panel-strong">
     <div class="wrapper full-text">
       <div class="section-head">
         <h2>Built for crowds, proven in venues</h2>
@@ -1459,7 +1665,7 @@
     </div>
   </section>
 
-  <section class="panel">
+  <section id="shows" class="panel">
     <div class="wrapper full-text">
       <div class="section-head">
         <h2>Where it has run</h2>
@@ -1545,7 +1751,7 @@
     </div>
   </section>
 
-  <section>
+  <section id="origins">
     <div class="wrapper full-text">
       <div class="section-head">
         <h2>Inspiration</h2>
@@ -1571,7 +1777,7 @@
     </div>
   </section>
 
-  <section class="panel">
+  <section id="code" class="panel">
     <div class="wrapper full-text">
       <div class="section-head">
         <h2>The code is public</h2>
@@ -1625,7 +1831,7 @@
     </div>
   </section>
 
-  <section class="panel-strong">
+  <section id="about" class="panel-strong">
     <div class="wrapper">
       <div class="about-grid">
 
@@ -1678,6 +1884,45 @@
 
 
   <script>
+    // Menu: a jump list, because seven sections over 7500px of phone scroll
+    // is the one thing a fixed bar can genuinely help with.
+    (function () {
+      const btn = document.getElementById("menu-btn");
+      const panel = document.getElementById("menu-panel");
+      if (!btn || !panel) return;
+
+      let open = false;
+
+      function setOpen(next) {
+        open = next;
+        btn.setAttribute("aria-expanded", String(open));
+        btn.setAttribute("aria-label", open ? "Close menu" : "Open menu");
+        if (open) panel.hidden = false;
+        panel.classList.toggle("is-open", open);
+        // Keep the page behind from scrolling under an open full-screen panel.
+        document.documentElement.style.overflow = open ? "hidden" : "";
+        if (open) {
+          const first = panel.querySelector("a");
+          if (first) first.focus();
+        } else {
+          // hidden only after the fade, so the transition is visible
+          setTimeout(function () { if (!open) panel.hidden = true; }, 250);
+          btn.focus();
+        }
+      }
+
+      btn.addEventListener("click", function () { setOpen(!open); });
+
+      panel.addEventListener("click", function (e) {
+        // A tap on a link, or on the empty space around the list, closes it.
+        if (e.target.closest("a") || e.target === panel) setOpen(false);
+      });
+
+      document.addEventListener("keydown", function (e) {
+        if (e.key === "Escape" && open) setOpen(false);
+      });
+    })();
+
     // Sticky bar: shown once the hero is scrolled past. A scroll listener
     // rather than an IntersectionObserver, because the observer's first
     // callback races the hero video's layout and can latch the wrong
@@ -1771,6 +2016,115 @@
       requestAnimationFrame(animatePropagation);
     }
     requestAnimationFrame(animatePropagation);
+
+    // ---- Hero mesh: one orchestrated sequence on load, then it stops.
+    // blink -> lock -> sweep -> settle, which is the show in order. No loop:
+    // a perpetual animation behind a wordmark is noise, and stopping rAF
+    // outright means the hero costs nothing once it has played.
+    (function () {
+      const mesh = document.getElementById("hero-mesh");
+      const hero = document.querySelector(".hero");
+      if (!mesh || !hero) return;
+
+      const CELL = 32;   // must match .hero-mesh grid-template-columns
+      const SETTLED = 0.07;
+      const still = matchMedia("(prefers-reduced-motion: reduce)").matches;
+
+      let cells = [], freq = [], phase = [], lockAt = [];
+
+      function build() {
+        const cols = Math.ceil(hero.clientWidth / CELL);
+        const rows = Math.ceil(hero.clientHeight / CELL);
+        const n = cols * rows;
+        if (n === cells.length) return false;
+        mesh.textContent = "";
+        cells = []; freq = []; phase = []; lockAt = [];
+        for (let i = 0; i < n; i++) {
+          const c = document.createElement("i");
+          mesh.appendChild(c);
+          cells.push(c);
+          freq.push(9 + Math.random() * 7);
+          phase.push(Math.random() * Math.PI * 2);
+          // Found in a ragged order, the way a real room resolves.
+          lockAt.push(0.5 + Math.random() * 2.1);
+        }
+        return true;
+      }
+
+      function settle() {
+        for (const c of cells) c.style.opacity = SETTLED;
+      }
+
+      build();
+
+      if (still) {
+        settle();
+        return;
+      }
+
+      const SWEEP_AT = 2.7, SWEEP_LEN = 1.5, END = 4.6;
+      let t0 = null;
+      let played = false;
+
+      function frame(ts) {
+        if (t0 === null) t0 = ts;
+        const t = (ts - t0) / 1000;
+
+        for (let i = 0; i < cells.length; i++) {
+          let op;
+          if (t < lockAt[i]) {
+            // Blinking its id: a hard square wave, not a fade. The screen
+            // is either lit or it is not.
+            op = Math.sin(t * freq[i] + phase[i]) > 0 ? 0.5 : 0.03;
+          } else {
+            op = 0.16;
+          }
+
+          if (t > SWEEP_AT) {
+            const x = i % Math.ceil(hero.clientWidth / CELL);
+            const y = Math.floor(i / Math.ceil(hero.clientWidth / CELL));
+            const cols = Math.ceil(hero.clientWidth / CELL);
+            const rows = Math.ceil(hero.clientHeight / CELL);
+            const p = (x + y) / Math.max(1, (cols - 1) + (rows - 1));
+            const sweep = (t - SWEEP_AT) / SWEEP_LEN * 1.4 - 0.2;
+            op = Math.max(op, 0.16 + 0.55 * Math.max(0, 1 - Math.abs(p - sweep) * 6));
+          }
+
+          // Ease down to the settled state over the last stretch.
+          if (t > SWEEP_AT + SWEEP_LEN) {
+            const k = Math.min(1, (t - SWEEP_AT - SWEEP_LEN) / (END - SWEEP_AT - SWEEP_LEN));
+            op = op + (SETTLED - op) * k;
+          }
+
+          cells[i].style.opacity = op;
+        }
+
+        if (t < END) {
+          requestAnimationFrame(frame);
+        } else {
+          settle();
+        }
+      }
+
+      // Playing it into a hidden tab wastes it: the reader arrives after the
+      // room has already been found. Wait until the page is on screen.
+      function start() {
+        if (played || document.visibilityState !== "visible") return;
+        played = true;
+        requestAnimationFrame(frame);
+      }
+
+      start();
+      document.addEventListener("visibilitychange", start);
+
+      // A rotation changes the cell count; rebuild and leave it settled
+      // rather than replaying the sequence at the reader.
+      let rt;
+      window.addEventListener("resize", function () {
+        clearTimeout(rt);
+        rt = setTimeout(function () { if (build()) settle(); }, 200);
+      }, { passive: true });
+    })();
 
   </script>
 
