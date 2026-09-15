@@ -490,6 +490,11 @@
       figure.band--trail {
         margin-top: 1.75rem;
       }
+
+      /* Back to a proper touch target where there is actually a finger. */
+      .past-toggle {
+        height: 44px;
+      }
     }
 
     .clip-caption {
@@ -1242,8 +1247,11 @@
       align-items: center;
       justify-content: center;
       width: 100%;
-      height: 46px;
-      margin: 0.35rem 0 0 0;
+      /* Tight to the glyph. A 46px box around a 15px chevron left 16px of
+         dead space above and below it, and with the section's own 75px of
+         bottom padding underneath, the arrow ended up floating in a void. */
+      height: 32px;
+      margin: 0;
       padding: 0;
       border: 0;
       background: none;
