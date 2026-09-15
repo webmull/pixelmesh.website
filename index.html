@@ -1113,14 +1113,59 @@
     <script>
       // Belt-and-braces looping: preview servers without HTTP Range
       // support and some mobile power-saving modes drop the native
-      // loop. preload=auto keeps the whole 255KB file buffered, and
-      // if 'ended' ever fires despite the loop attribute, restart.
+      // loop. preload=auto keeps the file buffered, and if 'ended'
+      // ever fires despite the loop attribute, restart.
+      //
+      // And belt-and-braces STARTING. The autoplay attribute is a
+      // request, not a guarantee: iOS refuses it in Low Power Mode, a
+      // tab opened in the background starts paused, and data-saver
+      // modes decline outright. Every one of those fails silently and
+      // leaves the poster frame sitting there looking like a broken
+      // video. So ask, ignore the refusal, and ask again the moment
+      // anything changes that might make the answer different.
+      //
+      // Deliberately NOT gated on prefers-reduced-motion. The loop is
+      // aria-hidden decoration behind the wordmark, and a still frame
+      // is what a failure looks like here, not what a preference looks
+      // like.
       document.addEventListener('DOMContentLoaded', function () {
         var v = document.querySelector('.hero-video');
         if (!v) return;
+
         v.addEventListener('ended', function () {
           v.currentTime = 0;
-          v.play();
+          play();
+        });
+
+        function play() {
+          var p = v.play();
+          // Older Safari returns undefined rather than a promise.
+          if (p && typeof p.catch === 'function') {
+            p.catch(function () { /* refused; a later attempt may win */ });
+          }
+        }
+
+        function playIfPaused() {
+          if (v.paused) play();
+        }
+
+        play();
+        v.addEventListener('canplay', playIfPaused);
+        v.addEventListener('loadeddata', playIfPaused);
+
+        // A refusal is lifted by a user gesture, so take the first one
+        // going. Each listener removes itself; passive so none of them
+        // can delay a scroll.
+        ['touchstart', 'pointerdown', 'keydown', 'scroll'].forEach(function (evt) {
+          window.addEventListener(evt, function once() {
+            window.removeEventListener(evt, once);
+            playIfPaused();
+          }, { passive: true, once: true });
+        });
+
+        // Returning to a backgrounded tab is the other common case.
+        document.addEventListener('visibilitychange', function () {
+          if (document.visibilityState === 'visible') playIfPaused();
         });
       });
     </script>
