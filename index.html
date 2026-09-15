@@ -919,6 +919,13 @@
       max-width: 70ch;
     }
 
+    /* The opening section runs the full wrapper on request: it lost its
+       second column when the propagation grid went, and a 70ch column with
+       nothing beside it left the right half of the page empty. */
+    #overview p {
+      max-width: none;
+    }
+
     .split p {
       max-width: 62ch;
       /* readable measure only where visual exists */
@@ -950,28 +957,6 @@
     }
 
     /* Visuals */
-
-    .visual {
-      display: flex;
-      justify-content: flex-end;
-      width: 100%;
-    }
-
-    .propagation-grid {
-      width: clamp(200px, 28vw, 320px);
-      aspect-ratio: 1/1;
-      display: grid;
-      grid-template-columns: repeat(12, 1fr);
-      gap: clamp(2px, 0.35vw, 5px);
-      opacity: 0.2;
-      transition: opacity 0.6s ease;
-    }
-
-    .propagation-grid div {
-      background: #ffffff;
-      opacity: 0.1;
-      transition: opacity 0.2s ease;
-    }
 
 
 
@@ -1249,30 +1234,26 @@
       display: none;
     }
 
+    /* No plate, no border, no fill. The wide tap area is invisible and the
+       chevron is the only mark: this is the least important control on the
+       page and it should look like it. */
     .past-toggle {
       display: flex;
       align-items: center;
       justify-content: center;
-      /* Full width of the list, so it reads as the next row rather than a
-         puck floating under one. The glyph carries none of the weight now
-         that the shape does. */
       width: 100%;
       height: 46px;
-      margin: 0.9rem 0 0 0;
+      margin: 0.35rem 0 0 0;
       padding: 0;
-      border: 1px solid rgba(255, 255, 255, 0.12);
-      border-radius: 10px;
-      background: rgba(255, 255, 255, 0.025);
-      color: rgba(255, 255, 255, 0.6);
+      border: 0;
+      background: none;
+      color: rgba(255, 255, 255, 0.34);
       cursor: pointer;
-      transition: color 0.2s ease, border-color 0.2s ease,
-                  background 0.2s ease;
+      transition: color 0.2s ease;
     }
 
     .past-toggle:hover {
-      color: var(--text);
-      border-color: rgba(255, 255, 255, 0.28);
-      background: rgba(255, 255, 255, 0.06);
+      color: rgba(255, 255, 255, 0.75);
     }
 
     .past-toggle:focus-visible {
@@ -1281,8 +1262,8 @@
     }
 
     .past-toggle svg {
-      width: 16px;
-      height: 16px;
+      width: 15px;
+      height: 15px;
       transition: transform 0.25s ease;
     }
 
@@ -1437,19 +1418,9 @@
 
 
 
-      .propagation-grid {
-        width: min(260px, 70vw);
-        gap: clamp(2px, 1vw, 4px);
-      }
-
       .split {
         grid-template-columns: 1fr;
         gap: 0rem;
-      }
-
-      .visual {
-        justify-content: center;
-        margin-top: 1.5rem;
       }
     }
   </style>
@@ -1573,7 +1544,7 @@
   </section>
 
   <section id="overview">
-    <div class="wrapper split">
+    <div class="wrapper full-text">
       <div>
         <div class="section-head">
           <h2>A crowd as a display</h2>
@@ -1602,9 +1573,6 @@
           href="https://github.com/webmull/pixelmesh" target="_blank" rel="noopener">Read the
           code</a>.
         </p>
-      </div>
-      <div class="visual">
-        <div class="propagation-grid" id="propagation-grid"></div>
       </div>
     </div>
 
@@ -2046,76 +2014,6 @@
       apply();
     })();
 
-    const visualBlocks = document.querySelectorAll('.propagation-grid');
-    let propVisible = false;
-    const visualObserver = new IntersectionObserver(entries => {
-      entries.forEach(entry => {
-        entry.target.style.opacity = entry.isIntersecting ? "1" : "0.2";
-        propVisible = entry.isIntersecting;
-      });
-    }, { threshold: 0.3 });
-    visualBlocks.forEach(v => visualObserver.observe(v));
-
-    // The grid plays the show in miniature, on a loop:
-    //   1. cells strobe at random rates (phones blinking their IDs)
-    //   2. they lock steady one by one (the camera finding them)
-    //   3. a light sweep crosses the locked grid (the first effect)
-    const prop = document.getElementById("propagation-grid");
-    const size = 12;
-    const blinkFreq = [], blinkPhase = [], lockAt = [];
-    for (let i = 0; i < size * size; i++) {
-      prop.appendChild(document.createElement("div"));
-      blinkFreq[i]  = 3 + Math.random() * 3.5;
-      blinkPhase[i] = Math.random() * Math.PI * 2;
-      lockAt[i]     = 3.0 + Math.random() * 5.5;   // seconds into the loop
-    }
-
-    const LOOP = 16;          // total loop length in seconds
-    const SWEEP_START = 9.5;  // locked grid holds briefly, then the sweep
-    const SWEEP_LEN = 5;
-
-    let t = 0;
-    let tStart = null;
-    function animatePropagation(ts) {
-      // 144 style writes per frame: only pay for them while the grid
-      // is actually on screen, so scrolling elsewhere stays smooth.
-      if (!propVisible) {
-        tStart = null;   // restart the loop cleanly when it returns
-        requestAnimationFrame(animatePropagation);
-        return;
-      }
-      // Wall-clock via the rAF timestamp: frame-count timing runs
-      // double speed on 120Hz displays.
-      if (tStart === null) tStart = ts;
-      t = ((ts - tStart) / 1000) % LOOP;
-      const cells = prop.children;
-
-      for (let i = 0; i < cells.length; i++) {
-        const x = i % size;
-        const y = Math.floor(i / size);
-        let op;
-
-        if (t < lockAt[i]) {
-          // blinking: hard square-wave strobe, per-cell rate and phase
-          op = Math.sin(t * blinkFreq[i] + blinkPhase[i]) > 0 ? 0.7 : 0.05;
-        } else {
-          // found: settle to a steady glow
-          op = 0.3;
-        }
-
-        if (t > SWEEP_START) {
-          // diagonal band of light crossing the locked grid
-          const p = (x + y) / (2 * (size - 1));
-          const s = (t - SWEEP_START) / SWEEP_LEN * 1.4 - 0.2;
-          op = Math.max(op, 0.3 + 0.65 * Math.max(0, 1 - Math.abs(p - s) * 5));
-        }
-
-        cells[i].style.opacity = op;
-      }
-
-      requestAnimationFrame(animatePropagation);
-    }
-    requestAnimationFrame(animatePropagation);
 
     // ---- Hero mesh: one orchestrated sequence on load, then it stops.
     // blink -> lock -> sweep -> settle, which is the show in order. No loop:
