@@ -450,6 +450,28 @@
       margin: 0 0 2rem 0;
     }
 
+    .shot-pair {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 1.25rem;
+      margin-top: 2.5rem;
+    }
+
+    @media (max-width: 760px) {
+      .shot-pair {
+        grid-template-columns: 1fr;
+        gap: 1.75rem;
+      }
+    }
+
+    /* Stated once for the whole shoot rather than repeated under every
+       frame, which is how a credit turns into furniture. */
+    .photo-credit {
+      margin: 1rem 0 0 0;
+      font-size: 0.8rem;
+      color: var(--muted);
+    }
+
     /* The one that closes a section needs the space above instead, since
        there is nothing below it but the section padding. */
     figure.band--trail {
@@ -1585,15 +1607,32 @@
     </div>
 
     <div class="wrapper">
+      <div class="shot-pair">
+        <figure class="shot">
+          <img src="/public/testupnorth-crowd-arms.jpg" loading="lazy"
+               alt="An audience with their phones held above their heads, screens lit, during a pixelmesh effect">
+          <figcaption class="clip-caption">Every screen is one pixel.</figcaption>
+        </figure>
+        <figure class="shot">
+          <img src="/public/testupnorth-room-feed.jpg" loading="lazy"
+               alt="The room from the back, with the camera's live view of the audience on the screen at the front">
+          <figcaption class="clip-caption">
+            One camera at the front, reading the whole room.
+          </figcaption>
+        </figure>
+      </div>
+
       <figure class="shot band band--trail">
         <img src="/public/testupnorth-endcard.jpg" loading="lazy"
              alt="An audience member holding a phone showing the pixelmesh closing card: thanks for being part of the show, and for being a pixel, with their own stats beneath it">
-        <figcaption class="clip-caption">
-          What one pixel sees at the end. Test Up North, Leeds Building Society
-          Head Office, September 2026. Photography by <a class="inline-link"
-          href="https://testupnorth.com" target="_blank" rel="noopener">testupnorth.com</a>.
-        </figcaption>
+        <figcaption class="clip-caption">What one pixel sees at the end.</figcaption>
       </figure>
+
+      <p class="photo-credit">
+        Photographs from Test Up North, Leeds, September 2026, by
+        <a class="inline-link" href="https://testupnorth.com" target="_blank"
+           rel="noopener">testupnorth.com</a>.
+      </p>
     </div>
   </section>
 
@@ -1653,10 +1692,7 @@
         <img src="/public/testupnorth-crowd.jpg" loading="lazy"
              alt="A room of people holding their phones up, screens lit green in unison, during a pixelmesh effect">
         <figcaption class="clip-caption">
-          One effect, every phone in the room, no installs. Test Up North,
-          Leeds Building Society Head Office, September 2026. Photography by
-          <a class="inline-link" href="https://testupnorth.com" target="_blank"
-             rel="noopener">testupnorth.com</a>.
+          One effect, every phone in the room, no installs.
         </figcaption>
       </figure>
 
