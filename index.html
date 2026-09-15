@@ -891,6 +891,11 @@
     }
 
     .hero-tag {
+      /* Exempt from the global 68ch measure on p. That rule gave this a
+         784px block with no auto margins inside an 1100px centred parent,
+         so the text centred within a box that was itself 122px left of
+         centre. It is one line of display type; it needs no measure. */
+      max-width: none;
       font-size: 1.15rem;
       letter-spacing: 0.08em;
       text-transform: uppercase;
