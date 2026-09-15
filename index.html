@@ -1253,21 +1253,30 @@
       display: flex;
       align-items: center;
       justify-content: center;
-      width: 44px;
-      height: 44px;
-      margin: 1.1rem auto 0 auto;
+      width: 62px;
+      height: 62px;
+      margin: 1.6rem auto 0 auto;
       padding: 0;
-      border: 1px solid rgba(255, 255, 255, 0.14);
+      border: 1px solid rgba(255, 255, 255, 0.18);
       border-radius: 50%;
-      background: transparent;
-      color: var(--muted);
+      /* Enough of a plate to read as a control rather than a stray glyph,
+         and it lifts off both the panel and the plain section background. */
+      background: rgba(255, 255, 255, 0.035);
+      color: rgba(255, 255, 255, 0.72);
       cursor: pointer;
-      transition: color 0.2s ease, border-color 0.2s ease;
+      transition: color 0.2s ease, border-color 0.2s ease,
+                  background 0.2s ease, transform 0.2s ease;
     }
 
     .past-toggle:hover {
       color: var(--text);
-      border-color: rgba(255, 255, 255, 0.3);
+      border-color: rgba(255, 255, 255, 0.38);
+      background: rgba(255, 255, 255, 0.07);
+      transform: translateY(1px);
+    }
+
+    .past-toggle:active {
+      transform: translateY(2px);
     }
 
     .past-toggle:focus-visible {
@@ -1276,8 +1285,8 @@
     }
 
     .past-toggle svg {
-      width: 18px;
-      height: 18px;
+      width: 26px;
+      height: 26px;
       transition: transform 0.25s ease;
     }
 
@@ -1289,6 +1298,11 @@
       .past-toggle svg,
       .past-toggle {
         transition: none;
+      }
+
+      .past-toggle:hover,
+      .past-toggle:active {
+        transform: none;
       }
     }
 
@@ -1952,8 +1966,8 @@
       btn.setAttribute("aria-expanded", "false");
       btn.setAttribute("aria-controls", list.id);
       btn.innerHTML = '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor"'
-        + ' stroke-width="2" stroke-linecap="round" stroke-linejoin="round"'
-        + ' aria-hidden="true"><path d="M6 9l6 6 6-6"/></svg>';
+        + ' stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"'
+        + ' aria-hidden="true"><path d="M5 9l7 7 7-7"/></svg>';
 
       function label() {
         const open = btn.getAttribute("aria-expanded") === "true";
