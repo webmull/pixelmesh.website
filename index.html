@@ -275,11 +275,11 @@
     /* Photographs, unlike .section-clip, get no saturate filter: that one
        exists to tame the detector's pure green, and it only makes a room
        full of people look ill. */
+    /* Photographs sit ON the column grid rather than centred inside it.
+       A centred block narrower than the measure has nothing to line up
+       with, so it reads as floating in the gutter. */
     figure.shot {
-      /* Half width and centred. At full wrapper width these read as hero
-         images and outweigh the copy they are supporting. */
-      max-width: 560px;
-      margin: 2.25rem auto 0 auto;
+      margin: 0;
     }
 
     figure.shot img {
@@ -288,6 +288,39 @@
       height: auto;
       border-radius: 12px;
       border: 1px solid rgba(255, 255, 255, 0.08);
+    }
+
+    /* Wide subject, so it spans the full measure and is cropped to a band.
+       Full height would tower over the stats row underneath it. */
+    figure.band {
+      margin: 0 0 2.5rem 0;
+    }
+
+    figure.band img {
+      aspect-ratio: 16 / 7;
+      object-fit: cover;
+      /* Biased up: the phones are above the heads. */
+      object-position: center 38%;
+    }
+
+    /* The one in the intro rides the visual column, under the grid, which
+       was empty space against a much taller text column. */
+    .visual-stack {
+      display: flex;
+      flex-direction: column;
+      align-items: flex-end;
+      gap: 1.75rem;
+      width: 100%;
+    }
+
+    @media (max-width: 900px) {
+      .visual-stack {
+        align-items: stretch;
+      }
+
+      figure.band img {
+        aspect-ratio: 4 / 3;
+      }
     }
 
     .clip-caption {
@@ -1227,18 +1260,19 @@
         </p>
       </div>
       <div class="visual">
-        <div class="propagation-grid" id="propagation-grid"></div>
-      </div>
-    </div>
+        <div class="visual-stack">
+          <div class="propagation-grid" id="propagation-grid"></div>
 
-    <div class="wrapper">
-      <figure class="shot">
-        <img src="/public/testupnorth-endcard.jpg" loading="lazy"
-             alt="An audience member holding a phone showing the pixelmesh closing card: thanks for being part of the show, and for being a pixel, with their own stats beneath it">
-        <figcaption class="clip-caption">
-          What one pixel sees at the end. Test Up North, Leeds Building Society Head Office, September 2026. Photography by <a class="inline-link" href="https://testupnorth.com" target="_blank" rel="noopener">testupnorth.com</a>.
-        </figcaption>
-      </figure>
+          <figure class="shot">
+            <img src="/public/testupnorth-endcard.jpg" loading="lazy"
+                 alt="An audience member holding a phone showing the pixelmesh closing card: thanks for being part of the show, and for being a pixel, with their own stats beneath it">
+            <figcaption class="clip-caption">
+              What one pixel sees at the end. Photography by <a class="inline-link"
+              href="https://testupnorth.com" target="_blank" rel="noopener">testupnorth.com</a>.
+            </figcaption>
+          </figure>
+        </div>
+      </div>
     </div>
   </section>
 
@@ -1296,11 +1330,14 @@
         <h2>Built for crowds, proven in venues</h2>
       </div>
 
-      <figure class="shot" style="margin-top: 0.5rem;">
+      <figure class="shot band">
         <img src="/public/testupnorth-crowd.jpg" loading="lazy"
              alt="A room of people holding their phones up, screens lit green in unison, during a pixelmesh effect">
         <figcaption class="clip-caption">
-          One effect, every phone in the room, no installs. Test Up North, Leeds Building Society Head Office, September 2026. Photography by <a class="inline-link" href="https://testupnorth.com" target="_blank" rel="noopener">testupnorth.com</a>.
+          One effect, every phone in the room, no installs. Test Up North,
+          Leeds Building Society Head Office, September 2026. Photography by
+          <a class="inline-link" href="https://testupnorth.com" target="_blank"
+             rel="noopener">testupnorth.com</a>.
         </figcaption>
       </figure>
 
