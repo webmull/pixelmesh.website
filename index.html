@@ -290,35 +290,22 @@
       border: 1px solid rgba(255, 255, 255, 0.08);
     }
 
-    /* Wide subject, so it spans the full measure and is cropped to a band.
-       Full height would tower over the stats row underneath it. */
+    /* Full measure, so the edges line up with the copy above and below. */
     figure.band {
-      margin: 0 0 2.5rem 0;
+      margin: 2.5rem 0 0 0;
     }
 
-    figure.band img {
+    /* Cropped in CSS because the source is 3:2 and full height would tower
+       over everything under it. Biased up: the phones are above the heads. */
+    figure.band--crop img {
       aspect-ratio: 16 / 7;
       object-fit: cover;
-      /* Biased up: the phones are above the heads. */
       object-position: center 38%;
     }
 
-    /* The one in the intro rides the visual column, under the grid, which
-       was empty space against a much taller text column. */
-    .visual-stack {
-      display: flex;
-      flex-direction: column;
-      align-items: flex-end;
-      gap: 1.75rem;
-      width: 100%;
-    }
-
     @media (max-width: 900px) {
-      .visual-stack {
-        align-items: stretch;
-      }
-
-      figure.band img {
+      figure.band--crop img {
+        /* A letterbox on a phone is just a stripe. */
         aspect-ratio: 4 / 3;
       }
     }
@@ -1260,19 +1247,20 @@
         </p>
       </div>
       <div class="visual">
-        <div class="visual-stack">
-          <div class="propagation-grid" id="propagation-grid"></div>
-
-          <figure class="shot">
-            <img src="/public/testupnorth-endcard.jpg" loading="lazy"
-                 alt="An audience member holding a phone showing the pixelmesh closing card: thanks for being part of the show, and for being a pixel, with their own stats beneath it">
-            <figcaption class="clip-caption">
-              What one pixel sees at the end. Photography by <a class="inline-link"
-              href="https://testupnorth.com" target="_blank" rel="noopener">testupnorth.com</a>.
-            </figcaption>
-          </figure>
-        </div>
+        <div class="propagation-grid" id="propagation-grid"></div>
       </div>
+    </div>
+
+    <div class="wrapper">
+      <figure class="shot band">
+        <img src="/public/testupnorth-endcard.jpg" loading="lazy"
+             alt="An audience member holding a phone showing the pixelmesh closing card: thanks for being part of the show, and for being a pixel, with their own stats beneath it">
+        <figcaption class="clip-caption">
+          What one pixel sees at the end. Test Up North, Leeds Building Society
+          Head Office, September 2026. Photography by <a class="inline-link"
+          href="https://testupnorth.com" target="_blank" rel="noopener">testupnorth.com</a>.
+        </figcaption>
+      </figure>
     </div>
   </section>
 
@@ -1330,7 +1318,7 @@
         <h2>Built for crowds, proven in venues</h2>
       </div>
 
-      <figure class="shot band">
+      <figure class="shot band band--crop">
         <img src="/public/testupnorth-crowd.jpg" loading="lazy"
              alt="A room of people holding their phones up, screens lit green in unison, during a pixelmesh effect">
         <figcaption class="clip-caption">
@@ -1340,16 +1328,6 @@
              rel="noopener">testupnorth.com</a>.
         </figcaption>
       </figure>
-
-      <div class="stats-row">
-        <div class="stat"><b>53</b><span>phones connected</span></div>
-        <div class="stat"><b>87%</b><span>located by one camera</span></div>
-        <div class="stat"><b>27s</b><span>median time to find</span></div>
-        <div class="stat"><b>0</b><span>installs required</span></div>
-      </div>
-      <p class="stats-note">
-        Numbers from the most recent live run, July 2026.
-      </p>
 
       <div class="practice-grid">
         <div class="practice-card">
