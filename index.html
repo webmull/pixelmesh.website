@@ -290,8 +290,17 @@
       border: 1px solid rgba(255, 255, 255, 0.08);
     }
 
-    /* Full measure, so the edges line up with the copy above and below. */
+    /* Full measure, so the edges line up with the copy above and below.
+       No top margin by default: a band following a .section-head would
+       otherwise stack on the head's own 1.2rem and open a 59px hole where
+       every other section has 19px. */
     figure.band {
+      margin: 0 0 2rem 0;
+    }
+
+    /* The one that closes a section needs the space above instead, since
+       there is nothing below it but the section padding. */
+    figure.band--trail {
       margin: 2.5rem 0 0 0;
     }
 
@@ -307,6 +316,23 @@
       figure.band--crop img {
         /* A letterbox on a phone is just a stripe. */
         aspect-ratio: 4 / 3;
+      }
+
+      /* The closing card is cropped wide for desktop, which at phone width
+         collapses to a ~150px strip with an unreadable handset in it. Crop
+         back IN on the phone instead, biased right to where it sits. */
+      figure.band--trail img {
+        aspect-ratio: 4 / 3;
+        object-fit: cover;
+        object-position: 76% center;
+      }
+
+      figure.band {
+        margin-bottom: 1.5rem;
+      }
+
+      figure.band--trail {
+        margin-top: 1.75rem;
       }
     }
 
@@ -1252,7 +1278,7 @@
     </div>
 
     <div class="wrapper">
-      <figure class="shot band">
+      <figure class="shot band band--trail">
         <img src="/public/testupnorth-endcard.jpg" loading="lazy"
              alt="An audience member holding a phone showing the pixelmesh closing card: thanks for being part of the show, and for being a pixel, with their own stats beneath it">
         <figcaption class="clip-caption">
