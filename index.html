@@ -109,7 +109,12 @@
       font-family: 'Inter', sans-serif;
       background: var(--bg);
       color: var(--text);
-      line-height: 1.65;
+      line-height: 1.55;
+      -webkit-font-smoothing: antialiased;
+      /* Notch and home-indicator safe on iPhone, which the fixed bar and the
+         full-bleed sections both need. */
+      padding-left: env(safe-area-inset-left);
+      padding-right: env(safe-area-inset-right);
     }
 
     /* Layout */
@@ -118,6 +123,12 @@
       max-width: 1100px;
       margin: 0 auto;
       padding: 0 2.25rem;
+    }
+
+    section {
+      /* The bar is fixed and 63px tall; without this an in-page jump lands
+         with the heading underneath it. */
+      scroll-margin-top: 78px;
     }
 
     /* STICKY BAR
@@ -137,6 +148,7 @@
       justify-content: space-between;
       gap: 1rem;
       padding: 0.85rem 2.25rem;
+      padding-top: calc(0.85rem + env(safe-area-inset-top));
       background: rgba(2, 2, 4, 0.72);
       backdrop-filter: blur(14px);
       -webkit-backdrop-filter: blur(14px);
@@ -234,7 +246,8 @@
       height: 100%;
       object-fit: cover;
       /* Footage is already dark - run it at full strength and lift it
-         slightly so the crowd reads on small bright screens. */
+         slightly so the crowd reads on small bright screens. Lifted further
+         on phones, which are usually looked at in daylight. */
       filter: brightness(1.15);
     }
 
@@ -327,6 +340,10 @@
         object-position: 76% center;
       }
 
+      .hero-video {
+        filter: brightness(1.32);
+      }
+
       figure.band {
         margin-bottom: 1.5rem;
       }
@@ -416,11 +433,11 @@
 
     .practice-label {
       display: block;
-      font-size: 0.68rem;
-      letter-spacing: 0.28em;
-      text-transform: uppercase;
-      color: var(--muted);
-      margin-bottom: 0.55rem;
+      font-size: 1rem;
+      font-weight: 600;
+      letter-spacing: -0.01em;
+      color: var(--text);
+      margin-bottom: 0.5rem;
     }
 
     .practice-card p {
@@ -531,9 +548,8 @@
     }
 
     .origin-creator {
-      font-size: 0.68rem;
-      letter-spacing: 0.28em;
-      text-transform: uppercase;
+      font-size: 0.85rem;
+      letter-spacing: 0;
       color: var(--muted);
     }
 
@@ -544,6 +560,47 @@
     }
 
     /* OPEN SOURCE */
+
+    .read-first {
+      margin-bottom: 1.1rem;
+    }
+
+    .file-list {
+      list-style: none;
+      padding: 0;
+      margin: 0 0 2rem 0;
+      display: grid;
+      gap: 0.9rem;
+    }
+
+    .file-list li {
+      display: grid;
+      gap: 0.3rem;
+      padding-left: 1rem;
+      /* A rule rather than a card: these are pointers into the repository,
+         not another set of tiles. */
+      border-left: 2px solid rgba(255, 255, 255, 0.16);
+    }
+
+    .file-list a {
+      font-family: ui-monospace, SFMono-Regular, Menlo, Consolas, monospace;
+      font-size: 0.95rem;
+      color: var(--text);
+      text-decoration: none;
+      border-bottom: 1px solid rgba(255, 255, 255, 0.25);
+      justify-self: start;
+      padding-bottom: 1px;
+    }
+
+    .file-list a:hover {
+      border-bottom-color: var(--text);
+    }
+
+    .file-list span {
+      color: var(--muted);
+      font-size: 0.95rem;
+      max-width: 62ch;
+    }
 
     .repo-card {
       display: flex;
@@ -631,13 +688,20 @@
       letter-spacing: 0.08em;
       text-transform: uppercase;
       color: var(--muted);
+      /* Each clause is one unit. Tracked caps were breaking "ONE CANVAS."
+         across lines on a phone, which reads as a typo. */
+      text-wrap: balance;
+    }
+
+    .hero-tag span {
+      white-space: nowrap;
     }
 
     /* Sections */
 
     section {
       position: relative;
-      padding: 2.75rem 0 3.5rem 0;
+      padding: clamp(2.5rem, 2rem + 2vw, 4rem) 0 clamp(3rem, 2.4rem + 2.4vw, 4.75rem) 0;
     }
 
     section::before {
@@ -668,8 +732,11 @@
     /* Text behaviour */
 
     .full-text p {
-      max-width: none;
-      /* allow full span */
+      /* Was "none", which ran these to the full 1028px wrapper: about 120
+         characters a line, roughly half again past where the eye reliably
+         finds the next line. The section still spans full width, the prose
+         inside it does not. */
+      max-width: 70ch;
     }
 
     .split p {
@@ -683,26 +750,23 @@
       margin-bottom: 1.2rem;
     }
 
-    .section-head small {
-      display: block;
-      font-size: 0.7rem;
-      letter-spacing: 0.3em;
-      text-transform: uppercase;
-      color: var(--muted);
-      opacity: 0.7;
-      margin-bottom: 0.6rem;
-    }
-
     .section-head h2 {
       font-weight: 600;
-      font-size: 2.1rem;
-      letter-spacing: -0.01em;
+      /* One scale from phone to desktop. The old fixed 2.1/1.6 pair gave
+         every section the same weight and no display moment anywhere. */
+      font-size: clamp(1.9rem, 7vw, 3rem);
+      line-height: 1.08;
+      letter-spacing: -0.025em;
+      text-wrap: balance;
     }
 
     p {
       color: var(--muted);
       margin-bottom: 1.2rem;
-      font-size: 1rem;
+      /* Nudges up on small screens rather than down: 16px at a 1.65 measure
+         was turning each paragraph into a six-line wall on a phone. */
+      font-size: clamp(1.02rem, 0.98rem + 0.3vw, 1.08rem);
+      max-width: 68ch;
     }
 
     /* Visuals */
@@ -804,12 +868,15 @@
 
     /* EVENTS */
 
+    /* These two survive as labels because Upcoming and Past are real
+       categories the list is divided by, unlike the section eyebrows. */
     .events-group-heading {
-      font-size: 0.6rem;
-      letter-spacing: 0.3em;
-      text-transform: uppercase;
-      color: var(--muted);
-      margin: 2rem 0 0.25rem 0;
+      font-size: 0.95rem;
+      font-weight: 500;
+      letter-spacing: 0;
+      color: var(--text);
+      opacity: 0.55;
+      margin: 2.25rem 0 0.4rem 0;
     }
 
     .events-group-heading:first-of-type {
@@ -946,10 +1013,12 @@
       letter-spacing: 0.01em;
     }
 
+    /* Venue and city are a payload, not a label. In tracked caps at 0.7rem
+       "Leeds Building Society Head Office" wrapped to two lines and had to be
+       decoded rather than read. */
     .event-place {
-      font-size: 0.7rem;
-      letter-spacing: 0.14em;
-      text-transform: uppercase;
+      font-size: 0.9rem;
+      letter-spacing: 0;
       color: var(--muted);
     }
 
@@ -1025,9 +1094,6 @@
         gap: 1.1rem;
       }
 
-      .section-head h2 {
-        font-size: 1.6rem;
-      }
 
       /* Stats as an aligned 2x2 grid instead of ragged flex wrap */
       .stats-row {
@@ -1234,7 +1300,9 @@
       </h1>
 
       <p class="hero-tag">
-        CALIBRATED IN REAL TIME. SHARED CLOCK. ONE CANVAS.
+        <span>Calibrated in real time.</span>
+        <span>Shared clock.</span>
+        <span>One canvas.</span>
       </p>
 
     </div>
@@ -1244,7 +1312,6 @@
     <div class="wrapper split">
       <div>
         <div class="section-head">
-          <small>Introduction</small>
           <h2>A crowd as a display</h2>
         </div>
         <p>
@@ -1293,7 +1360,6 @@
   <section class="panel">
     <div class="wrapper">
       <div class="section-head">
-        <small>Discovery</small>
         <h2>How devices find their place</h2>
       </div>
 
@@ -1304,7 +1370,7 @@
           <source src="/public/video/birmingham-detect.mp4" type="video/mp4">
         </video>
         <p class="clip-caption">
-          Birmingham, July 2026 &middot; 46 phones located live &middot; 5&times; speed
+          Birmingham, July 2026. 46 phones located live, played at 5&times; speed.
         </p>
       </div>
 
@@ -1340,7 +1406,6 @@
   <section class="panel-strong">
     <div class="wrapper full-text">
       <div class="section-head">
-        <small>In practice</small>
         <h2>Built for crowds, proven in venues</h2>
       </div>
 
@@ -1397,7 +1462,6 @@
   <section class="panel">
     <div class="wrapper full-text">
       <div class="section-head">
-        <small>Events</small>
         <h2>Where it has run</h2>
       </div>
 
@@ -1407,28 +1471,28 @@
           <div class="event-when"><b>17</b><span>Sep</span></div>
           <div class="event-info">
             <span class="event-group">Practically AI<span class="event-next-badge">next</span></span>
-            <span class="event-place">Matillion &middot; Manchester, UK</span>
+            <span class="event-place">Matillion, Manchester, UK</span>
           </div>
         </li>
         <li class="event">
           <div class="event-when"><b>24</b><span>Sep</span></div>
           <div class="event-info">
             <span class="event-group">Ministry of Testing, Leeds Chapter</span>
-            <span class="event-place">Hippocampus &middot; Leeds, UK</span>
+            <span class="event-place">Hippocampus, Leeds, UK</span>
           </div>
         </li>
         <li class="event">
           <div class="event-when"><b>1</b><span>Oct</span></div>
           <div class="event-info">
             <span class="event-group">Ministry of Testing, MotoCon26</span>
-            <span class="event-place">Brighton Dome &middot; Brighton, UK</span>
+            <span class="event-place">Brighton Dome, Brighton, UK</span>
           </div>
         </li>
         <li class="event">
           <div class="event-when"><b>19</b><span>Nov</span></div>
           <div class="event-info">
             <span class="event-group">Stoke on Tech</span>
-            <span class="event-place">Bet365 Stadium &middot; Stoke-on-Trent, UK</span>
+            <span class="event-place">Bet365 Stadium, Stoke-on-Trent, UK</span>
           </div>
         </li>
       </ul>
@@ -1439,42 +1503,42 @@
           <div class="event-when"><b>8</b><span>Sep</span></div>
           <div class="event-info">
             <span class="event-group">Test Up North</span>
-            <span class="event-place">Leeds Building Society Head Office &middot; Leeds, UK</span>
+            <span class="event-place">Leeds Building Society Head Office, Leeds, UK</span>
           </div>
         </li>
         <li class="event">
           <div class="event-when"><b>22</b><span>Jul</span></div>
           <div class="event-info">
             <span class="event-group">MaccTech</span>
-            <span class="event-place">Blue Beck &middot; Macclesfield, UK</span>
+            <span class="event-place">Blue Beck, Macclesfield, UK</span>
           </div>
         </li>
         <li class="event">
           <div class="event-when"><b>16</b><span>Jul</span></div>
           <div class="event-info">
             <span class="event-group">Birmingham Digital and DevOps Meetup</span>
-            <span class="event-place">x+why Foundry &middot; Birmingham, UK</span>
+            <span class="event-place">x+why Foundry, Birmingham, UK</span>
           </div>
         </li>
         <li class="event">
           <div class="event-when"><b>18</b><span>Jun</span></div>
           <div class="event-info">
             <span class="event-group">Ministry of Testing, London Chapter</span>
-            <span class="event-place">Fora, Blue Fin Building &middot; London, UK</span>
+            <span class="event-place">Fora, Blue Fin Building, London, UK</span>
           </div>
         </li>
         <li class="event">
           <div class="event-when"><b>5</b><span>May</span></div>
           <div class="event-info">
             <span class="event-group">Ministry of Testing, Manchester Chapter</span>
-            <span class="event-place">Matillion &middot; Manchester, UK</span>
+            <span class="event-place">Matillion, Manchester, UK</span>
           </div>
         </li>
         <li class="event">
           <div class="event-when"><b>26</b><span>Feb</span></div>
           <div class="event-info">
             <span class="event-group">PHP Stoke</span>
-            <span class="event-place">Smithfield Works &middot; Stoke-on-Trent, UK</span>
+            <span class="event-place">Smithfield Works, Stoke-on-Trent, UK</span>
           </div>
         </li>
       </ul>
@@ -1484,7 +1548,6 @@
   <section>
     <div class="wrapper full-text">
       <div class="section-head">
-        <small>Origins</small>
         <h2>Inspiration</h2>
       </div>
 
@@ -1511,33 +1574,47 @@
   <section class="panel">
     <div class="wrapper full-text">
       <div class="section-head">
-        <small>Open source</small>
         <h2>The code is public</h2>
       </div>
 
       <p>
-        pixelmesh only exists because the work above was written up in public. Junkyard
-        Jumbotron and PixelPhones were both described well enough that someone could pick
-        the idea up more than a decade later and take it somewhere new. That is the whole
-        reason this repository is open.
+        Junkyard Jumbotron and PixelPhones were both written up well enough to
+        build on a decade later. That is the whole reason this one is open too.
       </p>
 
       <p>
-        The part worth reading is not the light show. It is that a room of phones can be
-        located by one camera with no app, no QR code, no seat map and no calibration step:
-        every screen blinks its own ID in Manchester code, and the detector reads the whole
-        room at once. That is written down in full, including the constants that only got
-        right by failing in front of real audiences, and the failures that set them.
+        The part worth reading is not the light show. It is that a room of phones
+        can be located by one camera with no app, no QR code and no seat map.
       </p>
 
       <p>
-        It is not a product. No support, no stability promise, and it assumes a laptop, a
-        wired camera and a room. Take the parts that are useful.
+        It is not a product. No support, no stability promise, and it assumes a
+        laptop, a wired camera and a room.
       </p>
+
+      <p class="read-first">
+        If you only open two files, open these.
+      </p>
+
+      <ul class="file-list">
+        <li>
+          <a href="https://github.com/webmull/pixelmesh/blob/main/blink_encoder.py"
+             target="_blank" rel="noopener">blink_encoder.py</a>
+          <span>Turns a device id into light. Manchester coded, so every bit
+                carries its own transition and a half-lit screen still reads.</span>
+        </li>
+        <li>
+          <a href="https://github.com/webmull/pixelmesh/blob/main/blink_detector.py"
+             target="_blank" rel="noopener">blink_detector.py</a>
+          <span>Reads the whole room back out of one camera frame. Every
+                constant in it was set by watching it fail in front of people.</span>
+        </li>
+      </ul>
 
       <div class="repo-card">
         <p class="repo-meta">
-          MIT licensed. Python, FastAPI, OpenCV and a lot of comments about why.
+          MIT licensed. Python, FastAPI and OpenCV, with comments that explain
+          the decisions rather than the mechanism.
         </p>
         <a class="repo-link" href="https://github.com/webmull/pixelmesh"
            target="_blank" rel="noopener">
@@ -1558,7 +1635,6 @@
 
         <div class="about-content">
           <div class="section-head">
-            <small>Creator</small>
             <h2>Built by Adam Davis</h2>
           </div>
 
