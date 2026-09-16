@@ -697,8 +697,12 @@
       /* The settled state, in CSS. requestAnimationFrame is paused for a
          backgrounded tab, so starting at 0 meant a page opened in the
          background had no mesh at all. The sequence plays on top of this
-         rather than creating it. */
-      opacity: 0.07;
+         rather than creating it.
+
+         0.07 was barely above the 0.05 of the ruled grid behind it, so at
+         rest the points were invisible and you only ever saw the mesh if
+         you happened to catch the 4.6s sequence on load. */
+      opacity: 0.2;
       will-change: opacity;
     }
 
@@ -1614,12 +1618,12 @@
     <div class="wrapper">
       <div class="shot-pair">
         <figure class="shot">
-          <img src="/public/testupnorth-crowd-arms.jpg" loading="lazy"
+          <img src="/public/testupnorth-crowd-arms.jpg?v=2" loading="lazy"
                alt="An audience with their phones held above their heads, screens lit, during a pixelmesh effect">
           <figcaption class="clip-caption">Every screen is one pixel.</figcaption>
         </figure>
         <figure class="shot">
-          <img src="/public/testupnorth-room-feed.jpg" loading="lazy"
+          <img src="/public/testupnorth-room-feed.jpg?v=2" loading="lazy"
                alt="The room from the back, with the camera's live view of the audience on the screen at the front">
           <figcaption class="clip-caption">
             One camera at the front, reading the whole room.
@@ -2074,7 +2078,7 @@
       if (!mesh || !hero) return;
 
       const CELL = 32;   // must match .hero-mesh grid-template-columns
-      const SETTLED = 0.07;
+      const SETTLED = 0.2;   // must match .hero-mesh i opacity
       const still = matchMedia("(prefers-reduced-motion: reduce)").matches;
 
       let cells = [], freq = [], phase = [], lockAt = [];
